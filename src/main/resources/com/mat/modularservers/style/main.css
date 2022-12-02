@@ -1,0 +1,8 @@
+.chat {
+    margin-bottom: 10px;
+    display: table;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #212121;
+    background-color: aliceblue;
+}

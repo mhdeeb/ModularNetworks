@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane prefHeight="500.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mat.modularservers.controller.MainController">
+   <padding>
+      <Insets bottom="2.0" />
+   </padding>
+   <center>
+      <TabPane fx:id="tabs" tabClosingPolicy="ALL_TABS" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>

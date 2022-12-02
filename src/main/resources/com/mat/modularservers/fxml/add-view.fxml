@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.TextFlow?>
+<?import org.controlsfx.control.ToggleSwitch?>
+
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mat.modularservers.controller.AddController">
+   <tabs>
+      <Tab fx:id="tab0" closable="false" text="+">
+         <content>
+            <AnchorPane prefWidth="8.0">
+               <children>
+                  <Label focusTraversable="false" layoutX="27.0" layoutY="56.0" text="Name:" />
+                  <Label fx:id="addressL" focusTraversable="false" layoutX="25.0" layoutY="94.0" text="Address:" />
+                  <Label focusTraversable="false" layoutX="32.0" layoutY="133.0" text="Port:" />
+                  <TextField fx:id="name" layoutX="72.0" layoutY="52.0" onAction="#traverse" promptText="tab name"/>
+                  <TextField fx:id="address" layoutX="72.0" layoutY="90.0" onAction="#traverse" promptText="ex 127.0.0.1" text="localhost"/>
+                  <TextField fx:id="port" layoutX="72.0" layoutY="129.0" onAction="#traverse" promptText="ex 5000"/>
+                  <ScrollPane fx:id="debuggerScrollPane" focusTraversable="false" layoutX="240.0" layoutY="52.0">
+                     <content>
+                        <TextFlow lineSpacing="1.0" prefHeight="293.0" prefWidth="257.0">
+                           <children>
+                              <TextArea fx:id="debuggerTextArea" editable="false" prefHeight="293.0" prefWidth="257.0" />
+                           </children>
+                        </TextFlow>
+                     </content>
+                  </ScrollPane>
+                  <VBox layoutX="47.0" layoutY="179.0" prefHeight="108.0" prefWidth="151.0" spacing="20.0">
+                     <children>
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label focusTraversable="false" text="TCP" />
+                              <ToggleSwitch fx:id="udpSwitch" prefHeight="18.0" prefWidth="48.0" />
+                              <Label focusTraversable="false" text="UDP" />
+                           </children>
+                        </HBox>
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label focusTraversable="false" text="Server" />
+                              <ToggleSwitch fx:id="clientSwitch" prefHeight="18.0" prefWidth="35.0" />
+                              <Label focusTraversable="false" text="Client" />
+                           </children>
+                        </HBox>
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label focusTraversable="false" text="Chat" />
+                              <ToggleSwitch fx:id="dataSwitch" prefHeight="18.0" prefWidth="44.0" />
+                              <Label focusTraversable="false" text="Data" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <Button fx:id="button" layoutX="7.0" layoutY="436.0" mnemonicParsing="false" onAction="#createModule" text="Create" />
+                  <Label focusTraversable="false" layoutX="14.0" layoutY="308.0" text="Timeout:" />
+                  <TextField fx:id="timeout" layoutX="72.0" layoutY="304.0" onAction="#traverse" text="5"/>
+                  <Label layoutX="12.0" layoutY="347.0" text="Attempts:" />
+                  <TextField fx:id="attempts" layoutX="72.0" layoutY="343.0" text="3000"/>
+                  <Label fx:id="date" layoutX="376.0" layoutY="439.0" text="00-00-0000 00:00:00" textFill="#9e9e9e" />
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+   </tabs>
+</TabPane>

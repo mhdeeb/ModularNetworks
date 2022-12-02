@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.TextFlow?>
+
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mat.modularservers.controller.ServerController">
+   <tabs>
+      <Tab fx:id="tab0" closable="false" text="+">
+         <content>
+            <AnchorPane prefWidth="8.0">
+               <children>
+                  <ScrollPane fx:id="debuggerScrollPane" focusTraversable="false" layoutX="240.0" layoutY="52.0">
+                     <content>
+                        <TextFlow lineSpacing="1.0" prefHeight="293.0" prefWidth="257.0">
+                           <children>
+                              <TextArea fx:id="debuggerTextArea" editable="false" prefHeight="293.0" prefWidth="257.0" />
+                           </children>
+                        </TextFlow>
+                     </content>
+                  </ScrollPane>
+                  <Label fx:id="date" layoutX="376.0" layoutY="439.0" text="00-00-0000 00:00:00" textFill="#9e9e9e" />
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+   </tabs>
+</TabPane>
