@@ -14,7 +14,7 @@ import java.util.Objects;
 public class ModularNetworks extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/mat/modularservers/fxml/chat-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/mat/modularservers/fxml/main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 505, 500);
         stage.setTitle("Modular Networks");
         stage.getIcons().add(new Image(Objects.requireNonNull(ModularNetworks.class.getResourceAsStream("/com/mat/modularservers/images/data-server.png"))));

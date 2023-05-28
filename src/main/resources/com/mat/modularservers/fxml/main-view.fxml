@@ -4,11 +4,12 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane prefHeight="500.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mat.modularservers.controller.MainController">
+
+<BorderPane prefHeight="500.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <TabPane fx:id="tabs" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+   </center>
    <padding>
       <Insets bottom="2.0" />
    </padding>
-   <center>
-      <TabPane fx:id="tabs" tabClosingPolicy="ALL_TABS" BorderPane.alignment="CENTER" />
-   </center>
 </BorderPane>

@@ -9,11 +9,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.TextFlow?>
-<?import org.controlsfx.control.ToggleSwitch?>
-
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mat.modularservers.controller.AddController">
+<?import org.controlsfx.control.ToggleSwitch?>
+
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mat.modularservers.controller.AddController">
    <tabs>
       <Tab fx:id="tab0" closable="false" text="+">
          <content>
