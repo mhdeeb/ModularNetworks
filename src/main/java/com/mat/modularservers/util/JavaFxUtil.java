@@ -70,7 +70,15 @@ public class JavaFxUtil {
         fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
         fileChooser.setInitialFileName(fileName);
         fileChooser.setTitle("Select Download Location");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("File", "*."+fileName.split("\\.")[1]));
+        String[] splitDots = fileName.split("\\.");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("File", "*." + splitDots[splitDots.length - 1]));
         return fileChooser.showSaveDialog(new Popup());
+    }
+        public static File setDownloadLocation() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+        fileChooser.setTitle("Select Download Location");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All", "*.*"));
+        return fileChooser.showOpenDialog(new Popup());
     }
 }

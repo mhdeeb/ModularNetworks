@@ -4,11 +4,10 @@ package com.mat.modularservers.module;
 import com.mat.modularservers.util.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 
-//TODO: Ban, Kick, IPBan notifications.
+//TODO: Better Storage System
 public class ClientList implements Iterable<SocketWrapper> {
     private String
             welcomeMessage = "Welcome to the server!",
@@ -34,6 +33,7 @@ public class ClientList implements Iterable<SocketWrapper> {
             pendingList.add(client);
             return false;
         } else if (add(client)) {
+            pendingList.remove(client);
             client.sendMessage(welcomeMessage, MessageFlag.LOGIN_SUCCEEDED);
             client.setStatus(Status.CONNECTED);
             return true;
@@ -100,12 +100,23 @@ public class ClientList implements Iterable<SocketWrapper> {
 
     public void close() {
         clients.forEach(this::remove);
+        pendingList.forEach(SocketWrapper::stop);
+        pendingList.clear();
     }
 
     private boolean add(SocketWrapper client) {
-        if (queryMap.containsKey(client.getCredentials().username())) {
-            return false;
-        } else {
+        if (isForceLogin)
+            if (queryMap.containsKey(client.getCredentials().username())) {
+                return false;
+            } else {
+                queryMap.put(client.getCredentials().username(), client);
+                queryMap.put(client.getSocketAddress(), client);
+                queryMap.put(client.getName(), client);
+                clients.add(client);
+                return true;
+            }
+        else {
+            client.setCredentials(new Credentials("guest"+clients.size(), "guest"));
             queryMap.put(client.getCredentials().username(), client);
             queryMap.put(client.getSocketAddress(), client);
             queryMap.put(client.getName(), client);

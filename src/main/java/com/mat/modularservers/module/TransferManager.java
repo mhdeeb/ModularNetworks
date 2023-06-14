@@ -2,6 +2,7 @@ package com.mat.modularservers.module;
 
 import com.mat.modularservers.gui.Prompt;
 import com.mat.modularservers.util.*;
+import javafx.application.Platform;
 
 import java.io.*;
 import java.net.Socket;
@@ -11,6 +12,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
 //TODO: Fix Pause and Close
+//TODO: Send file button
+//TODO: uploader popup
 public class TransferManager {
     private final ArrayBlockingQueue<Message> messages;
     private final String name;
@@ -54,14 +57,14 @@ public class TransferManager {
                                 inputStream.readFully(buffer);
                                 String fileName = new String(buffer);
                                 prompt = new Prompt();
-                                flag(prompt.pop(fileName, dataSize, name));
+                                Platform.runLater(()-> ExceptionUtil.logExceptions(()->flag(prompt.pop(fileName, dataSize, name)), logger));
                             }
                             case DATA -> {
                                 byte[] buffer = new byte[inputStream.readInt()];
                                 inputStream.readFully(buffer);
-                                prompt.write(buffer);
+                                Platform.runLater(()-> ExceptionUtil.logExceptions(()->prompt.write(buffer), logger));
                             }
-                            case DATA_END -> prompt.complete();
+                            case DATA_END -> Platform.runLater(()-> ExceptionUtil.logExceptions(()->prompt.complete(), logger));
                             case QUIT -> {
                                 messages.put(new Message(flag, null, socket));
                                 close();

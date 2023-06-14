@@ -25,7 +25,7 @@ public enum MessageFlag {
     REGISTER_FAILED(0b10011),
     BAN_REPLY(0b10100),
     REGISTER_SUCCEEDED(0b10101),
-    NULL(0b10110);
+    NULL(0b10110), REQUEST_CLOSE(0b10111);
     private final byte Byte;
 
     MessageFlag(final int Byte) {

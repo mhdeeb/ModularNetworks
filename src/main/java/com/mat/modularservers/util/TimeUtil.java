@@ -13,15 +13,19 @@ import java.time.format.DateTimeFormatter;
 
 public class TimeUtil {
     private static final StringProperty time = new SimpleStringProperty(getDate());
+    private static final StringProperty logs = new SimpleStringProperty();
 
 
-//    static {
-//        new Thread(() -> {
-//            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> time.setValue(getDate())));
-//            timeline.setCycleCount(Timeline.INDEFINITE);
-//            timeline.play();
-//        }).start();
-//    }
+    static {
+        new Thread(() -> {
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+                logs.setValue(LoggerBoard.getErrorLogs());
+                time.setValue(getDate());
+            }));
+            timeline.setCycleCount(Timeline.INDEFINITE);
+            timeline.play();
+        }).start();
+    }
 
     static public String getDate() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
@@ -33,6 +37,10 @@ public class TimeUtil {
 
     static public StringProperty getTimeProperty() {
         return time;
+    }
+
+    static public StringProperty getLogsProperty() {
+        return logs;
     }
 
     static public Timeline execute(EventHandler<ActionEvent> f, int frequency, int limit) {

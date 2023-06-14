@@ -4,6 +4,7 @@ import com.mat.modularservers.util.*;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class SocketWrapper {
@@ -64,6 +65,10 @@ public class SocketWrapper {
     public void login(Credentials credentials) throws InterruptedException {
         setCredentials(credentials);
         transferManager.login(credentials.username(), credentials.password());
+    }
+
+    public void setSoTimeOut(int soTimeOut) throws SocketException {
+        socket.setSoTimeout(soTimeOut);
     }
 
     public void register(Credentials credentials) throws InterruptedException {

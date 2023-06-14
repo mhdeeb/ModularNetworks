@@ -13,8 +13,10 @@ import java.io.IOException;
 public class CompleteController {
 
     public Label fileLocation;
-
-    public void openLocation(ActionEvent actionEvent) throws IOException {
-        Desktop.getDesktop().open(new File(fileLocation.getText()));
-    }
+    public Label fileName;
+    public Label fileSize;
+    public Label source;
+    public Button cancel;
+    public Button openLocation;
+    public Button openFile;
 }

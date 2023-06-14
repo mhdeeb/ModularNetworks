@@ -1,10 +1,12 @@
 package com.mat.modularservers.client;
 
 
+import com.mat.modularservers.gui.Prompt;
 import com.mat.modularservers.module.IOBundle;
 import com.mat.modularservers.module.Logger;
 import com.mat.modularservers.module.SocketWrapper;
 import com.mat.modularservers.util.*;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -13,17 +15,21 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 //TODO: FIX LOGIN PROMPT.
 public class TcpClient {
-    private final IOBundle ioBundle;
-    private final SocketWrapper socket;
+    private IOBundle ioBundle;
+    private SocketWrapper socket;
     private final Logger logger = new Logger("Client", LoggerType.MESSAGE);
     private final ArrayBlockingQueue<Message> messageQueue = new ArrayBlockingQueue<>(1024);
 
-    public TcpClient(String address, int port, IOBundle ioBundle, int attempts, int repeatInterval) throws Exception {
+    public TcpClient(String address, int port, IOBundle ioBundle, int attempts, int repeatInterval) throws IOException {
         socket = new SocketWrapper(connect(address, port, attempts, repeatInterval), messageQueue);
         this.ioBundle = ioBundle;
         println("Connected to " + address + " on port " + port);
         read();
         write();
+    }
+
+    public void close() {
+        socket.stop();
     }
 
     private Socket connect(String address, int port, int attempts, int interval) throws ConnectException {
@@ -64,23 +70,18 @@ public class TcpClient {
                         socket.stop();
                     }
                     case LOGIN_REQUEST, LOGIN_FAILED, REGISTER_FAILED, REGISTER_SUCCEEDED -> {
-                        print("Input 1 for login and 2 for register");
-                        switch (ioBundle.read()) {
-                            case "1" -> {
-                                print("Enter Username: ");
-                                String user = ioBundle.read();
-                                print("Enter Password: ");
-                                String pass = ioBundle.read();
-                                socket.login(new Credentials(user, pass));
+                        Platform.runLater(() -> {
+                            try {
+                                Credentials credentials = Prompt.login(message.getMessage());
+                                if (credentials != null) socket.login(credentials);
+                                else {
+                                    socket.sendFlag(MessageFlag.QUIT);
+                                    socket.stop();
+                                }
+                            } catch (IOException | InterruptedException e) {
+                                throw new RuntimeException(e);
                             }
-                            case "2" -> {
-                                print("Enter Username: ");
-                                String user = ioBundle.read();
-                                print("Enter Password: ");
-                                String pass = ioBundle.read();
-                                socket.register(new Credentials(user, pass));
-                            }
-                        }
+                        });
                     }
                 }
             }

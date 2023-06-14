@@ -19,7 +19,7 @@ public class LoggerBoard {
         StringBuilder stringBuilder = new StringBuilder();
         for (Logger logger : loggers) {
             if (logger.getType() == loggerType)
-                stringBuilder.append(String.format("[%s]%s", logger.getName(), logger.getLog()));
+                stringBuilder.append(logger.getLog());
         }
         return stringBuilder.toString();
     }
@@ -28,7 +28,7 @@ public class LoggerBoard {
         StringBuilder stringBuilder = new StringBuilder();
         for (Logger logger : loggers) {
             if (logger.getName().equals(loggerName))
-                stringBuilder.append(String.format("[%s]%s", logger.getName(), logger.getLog()));
+                stringBuilder.append(logger.getLog());
         }
         return stringBuilder.toString();
     }
@@ -36,7 +36,7 @@ public class LoggerBoard {
     public static String getAllLogs() {
         StringBuilder stringBuilder = new StringBuilder();
         for (Logger logger : loggers) {
-            stringBuilder.append(String.format("[%s]%s", logger.getName(), logger.getLog()));
+            stringBuilder.append(logger.getLog());
         }
         return stringBuilder.toString();
     }

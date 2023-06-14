@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -11,6 +12,7 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="357.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mat.modularservers.controller.DownloadController">
+   <ProgressIndicator layoutX="520.0" layoutY="190.0" />
    <VBox prefHeight="401.0" prefWidth="600.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <opaqueInsets>
          <Insets />
@@ -22,72 +24,72 @@
          <VBox.margin>
             <Insets left="10.0" />
          </VBox.margin>
-         <Label prefHeight="25.0" prefWidth="115.0" text="File location">
+         <Label prefHeight="25.0" prefWidth="100.0" text="File location">
             <font>
                <Font size="16.0" />
             </font>
          </Label>
-         <Label prefHeight="18.0" prefWidth="450.0" />
+         <Label fx:id="fileLocation" prefHeight="25.0" prefWidth="450.0" />
       </HBox>
       <HBox>
          <VBox.margin>
             <Insets left="10.0" />
          </VBox.margin>
-         <Label prefHeight="25.0" prefWidth="115.0" text="File size">
+         <Label prefHeight="25.0" prefWidth="100.0" text="File size">
             <font>
                <Font size="16.0" />
             </font>
          </Label>
-         <Label prefHeight="18.0" prefWidth="450.0" />
+         <Label fx:id="fileSize" prefHeight="25.0" prefWidth="450.0" />
       </HBox>
       <HBox>
          <VBox.margin>
             <Insets left="10.0" />
          </VBox.margin>
-         <Label prefHeight="25.0" prefWidth="115.0" text="Downloaded">
+         <Label prefHeight="25.0" prefWidth="100.0" text="Downloaded">
             <font>
                <Font size="16.0" />
             </font>
          </Label>
-         <Label prefHeight="18.0" prefWidth="450.0" />
+         <Label fx:id="downloaded" prefHeight="25.0" prefWidth="450.0" />
       </HBox>
       <HBox>
          <VBox.margin>
             <Insets left="10.0" />
          </VBox.margin>
-         <Label prefHeight="25.0" prefWidth="115.0" text="Transfer rate">
+         <Label prefHeight="25.0" prefWidth="100.0" text="Transfer rate">
             <font>
                <Font size="16.0" />
             </font>
          </Label>
-         <Label prefHeight="18.0" prefWidth="450.0" />
+         <Label fx:id="transferRate" prefHeight="25.0" prefWidth="450.0" />
       </HBox>
       <HBox>
          <VBox.margin>
             <Insets left="10.0" />
          </VBox.margin>
-         <Label prefHeight="25.0" prefWidth="115.0" text="Time left">
+         <Label prefHeight="25.0" prefWidth="100.0" text="Time left">
             <font>
                <Font size="16.0" />
             </font>
          </Label>
-         <Label prefHeight="18.0" prefWidth="450.0" />
+         <Label fx:id="timeLeft" prefHeight="25.0" prefWidth="450.0" />
       </HBox>
       <Region prefHeight="85.0" prefWidth="590.0">
          <VBox.margin>
             <Insets />
          </VBox.margin>
       </Region>
-      <ProgressBar prefHeight="20.0" prefWidth="627.0" progress="0.0">
+      <ProgressBar fx:id="progressBar" prefHeight="20.0" prefWidth="627.0" progress="0.0">
          <padding>
             <Insets right="10.0" />
          </padding>
       </ProgressBar>
       <Region prefHeight="34.0" prefWidth="590.0" />
       <HBox alignment="CENTER" prefHeight="33.0" prefWidth="590.0">
-         <Button mnemonicParsing="false" text="Pause" />
+         <Button fx:id="pause" mnemonicParsing="false" text="Pause" />
          <Region prefHeight="33.0" prefWidth="70.0" />
-         <Button mnemonicParsing="false" text="Close" />
+         <Button fx:id="cancel" mnemonicParsing="false" text="Close" />
       </HBox>
    </VBox>
 </AnchorPane>

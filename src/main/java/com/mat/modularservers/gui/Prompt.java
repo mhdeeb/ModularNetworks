@@ -1,23 +1,22 @@
 package com.mat.modularservers.gui;
 
-import com.mat.modularservers.util.ExceptionUtil;
-import com.mat.modularservers.util.JavaFxUtil;
-import com.mat.modularservers.util.LinkedFixedList;
-import com.mat.modularservers.util.MessageFlag;
+import com.mat.modularservers.controller.CompleteController;
+import com.mat.modularservers.controller.DownloadController;
+import com.mat.modularservers.controller.SignInController;
+import com.mat.modularservers.controller.StartController;
+import com.mat.modularservers.util.*;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,7 +28,7 @@ public class Prompt {
     private long progress, bytesPerSecond;
     private DownloadPopup downloadPop;
     private CompletePopup completePop;
-    private final LinkedFixedList<Long> speedList = new LinkedFixedList<>(60);
+    private final LinkedFixedList<Long> speedList = new LinkedFixedList<>(5);
 
     public Prompt() {
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
@@ -40,7 +39,7 @@ public class Prompt {
 
     public void write(byte[] bytes) throws IOException {
         outputStream.write(bytes);
-        updateProgress(bytes.length);
+        Platform.runLater(() -> updateProgress(bytes.length));
     }
 
     public String getName() {
@@ -48,17 +47,19 @@ public class Prompt {
     }
 
     public void updateProgress(int progress) {
-        long total = speedList.sum();
-        float speed = (float) total / speedList.size();
         this.bytesPerSecond += progress;
         this.progress += progress;
-        downloadPop.update(speed, this.progress);
+        downloadPop.update((float) speedList.sum() / speedList.size(), this.progress);
     }
 
-    public void complete() throws IOException {
-        downloadPop.close();
-        completePop.pop();
-        ExceptionUtil.ignoreExceptions(outputStream::close);
+    public void complete() {
+        ExceptionUtil.ignoreExceptions(() -> {
+            outputStream.close();
+            Platform.runLater(() -> {
+                downloadPop.close();
+                ExceptionUtil.ignoreExceptions(() -> completePop.pop());
+            });
+        });
     }
 
     public MessageFlag pop(String fileName, long dataSize, String source) throws IOException {
@@ -76,11 +77,11 @@ public class Prompt {
         }
     }
 
-    public class DownloadPopup {
+    public static class DownloadPopup {
         private final String path;
         private final long dataSize;
         private final Stage stage = new Stage();
-        private AnchorPane anchorPane;
+        private DownloadController downloadController;
 
         public DownloadPopup(String path, long dataSize) {
             this.path = path;
@@ -94,19 +95,17 @@ public class Prompt {
         public void downloadPopup(String path, String fileSize) throws IOException {
             stage.setTitle("Downloading " + new File(path).getName() + " (0%)");
             stage.setResizable(false);
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/mat/modularservers/fxml/download-view.fxml"));
-            anchorPane = fxmlLoader.load();
-            ((Label) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(0)).getChildren().get(1)).setText(path);
-            ((Label) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(1)).getChildren().get(1)).setText(fileSize);
-            ((Button) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(8)).getChildren().get(0)).setOnAction(e -> {
-
+            FXMLLoader downloadView = new FXMLLoader(getClass().getResource(ResourcePath.DOWNLOAD_VIEW));
+            AnchorPane anchorPane = downloadView.load();
+            downloadController = downloadView.getController();
+            downloadController.fileLocation.setText(path);
+            downloadController.fileSize.setText(StringUtil.dataFormat(Double.parseDouble(fileSize)));
+            downloadController.pause.setOnAction(e -> {
             });
-            ((Button) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(8)).getChildren().get(2)).setOnAction(e -> {
-
+            downloadController.cancel.setOnAction(e -> {
                 stage.close();
             });
-            Scene scene = new Scene(anchorPane);
-            stage.setScene(scene);
+            stage.setScene(new Scene(anchorPane));
             stage.show();
         }
 
@@ -116,43 +115,43 @@ public class Prompt {
 
         public void update(float speed, long progress) {
             stage.setTitle("Downloading " + new File(path).getName() + " (" + progress * 100 / dataSize + "%)");
-            ((Label) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(2)).getChildren().get(1)).setText(String.valueOf(progress));
-            ((Label) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(3)).getChildren().get(1)).setText(String.valueOf(speed));
-            ((Label) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(4)).getChildren().get(1)).setText(String.valueOf((dataSize - progress) / speed));
-            ((ProgressBar) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(6)).setProgress((double) progress / dataSize);
+            downloadController.downloaded.setText(StringUtil.dataFormat(progress));
+            downloadController.transferRate.setText(StringUtil.dataFormat(speed) + "/sec");
+            downloadController.timeLeft.setText(String.format("%d sec", (int) ((dataSize - progress) / speed)));
+            downloadController.progressBar.setProgress((double) progress / dataSize);
         }
     }
 
-    public class StartPopup {
+    public static class StartPopup {
 
         public static String setDownloadLocation(String filename, String fileSize, String source) {
             try {
                 AtomicReference<File> file = new AtomicReference<>();
-                AtomicBoolean atomicBoolean = new AtomicBoolean(true);
+                AtomicBoolean atomicBoolean = new AtomicBoolean(false);
                 Stage stage = new Stage();
                 stage.setTitle("Select Download Location");
                 stage.setResizable(false);
-                FXMLLoader fxmlLoader = new FXMLLoader(StartPopup.class.getResource("/com/mat/modularservers/fxml/start-view.fxml"));
-                AnchorPane anchorPane = fxmlLoader.load();
-                ((Label) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(0)).getChildren().get(1)).setText(filename);
-                ((Label) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(1)).getChildren().get(1)).setText(fileSize);
-                ((Label) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(2)).getChildren().get(1)).setText(source);
-                ((TextField) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(4)).getChildren().get(1)).setText(System.getProperty("user.dir") + "\\" + filename);
-                ((Button) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(6)).getChildren().get(2)).setOnAction(e -> stage.close());
-                ((Button) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(4)).getChildren().get(3)).setOnAction(e -> {
-                    file.set(JavaFxUtil.setDownloadLocation(((Label) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(0)).getChildren().get(1)).getText()));
-                    if (file.get() != null)
-                        ((TextField) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(4)).getChildren().get(1)).setText(file.get().getAbsolutePath());
+                FXMLLoader startView = new FXMLLoader(StartPopup.class.getResource(ResourcePath.START_VIEW));
+                AnchorPane anchorPane = startView.load();
+                StartController startController = startView.getController();
+                startController.fileName.setText(filename);
+                startController.fileSize.setText(StringUtil.dataFormat(Double.parseDouble(fileSize)));
+                startController.source.setText(source);
+                startController.fileName.setText(filename);
+                startController.saveAs.setText(System.getProperty("user.dir") + "\\" + filename);
+                file.set(Paths.get(startController.saveAs.getText()).toFile());
+                startController.cancel.setOnAction(e -> stage.close());
+                startController.browse.setOnAction(e -> {
+                    file.set(JavaFxUtil.setDownloadLocation(startController.saveAs.getText()));
+                    if (file.get() != null) startController.saveAs.setText(file.get().getAbsolutePath());
                 });
-                ((Button) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(6)).getChildren().get(0)).setOnAction(e -> {
+                startController.startDownload.setOnAction(e -> {
+                    atomicBoolean.set(true);
                     stage.close();
-                    atomicBoolean.set(false);
                 });
-                Scene scene = new Scene(anchorPane);
-                stage.setScene(scene);
-                stage.show();
-                if (atomicBoolean.get())
-                    return file.get().getAbsolutePath();
+                stage.setScene(new Scene(anchorPane));
+                stage.showAndWait();
+                if (atomicBoolean.get()) return file.get().getAbsolutePath();
                 return null;
             } catch (Exception e) {
                 return null;
@@ -160,7 +159,7 @@ public class Prompt {
         }
     }
 
-    public class CompletePopup {
+    public static class CompletePopup {
         private final String path, fileName, source;
         private final long dataSize;
 
@@ -177,18 +176,59 @@ public class Prompt {
 
         public void completePopup(String fileLocation, String fileName, String fileSize, String source) throws IOException {
             Stage stage = new Stage();
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/mat/modularservers/fxml/complete-view.fxml"));
-            AnchorPane anchorPane = fxmlLoader.load();
-            ((Button) ((HBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(1)).getChildren().get(2)).setOnAction(e -> stage.close());
-            ((Label) ((HBox) ((VBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(0)).getChildren().get(0)).getChildren().get(1)).setText(fileLocation);
-            ((Label) ((HBox) ((VBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(0)).getChildren().get(1)).getChildren().get(1)).setText(fileName);
-            ((Label) ((HBox) ((VBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(0)).getChildren().get(2)).getChildren().get(1)).setText(fileSize);
-            ((Label) ((HBox) ((VBox) ((VBox) anchorPane.getChildren().get(0)).getChildren().get(0)).getChildren().get(3)).getChildren().get(1)).setText(source);
-            Scene scene = new Scene(anchorPane);
-            stage.setScene(scene);
+            FXMLLoader completeView = new FXMLLoader(getClass().getResource(ResourcePath.COMPLETE_VIEW));
+            AnchorPane anchorPane = completeView.load();
+            CompleteController completeController = completeView.getController();
+            completeController.openFile.setOnAction(e -> {
+                ExceptionUtil.ignoreExceptions(() -> Desktop.getDesktop().open(new File(completeController.fileLocation.getText())));
+                stage.close();
+            });
+            completeController.openLocation.setOnAction(e -> {
+                ExceptionUtil.ignoreExceptions(() -> Desktop.getDesktop().open(new File(StringUtil.subString(completeController.fileLocation.getText(), "\\", 0, -2))));
+                stage.close();
+            });
+            completeController.cancel.setOnAction(e -> stage.close());
+            completeController.fileLocation.setText(fileLocation);
+            completeController.fileName.setText(fileName);
+            completeController.fileSize.setText(StringUtil.dataFormat(Double.parseDouble(fileSize)));
+            completeController.source.setText(source);
+            stage.setScene(new Scene(anchorPane));
             stage.setTitle("Download Complete");
             stage.setResizable(false);
-            stage.show();
+            stage.showAndWait();
         }
     }
+
+    public static Credentials login(String message) throws IOException {
+        Stage stage = new Stage();
+        FXMLLoader signInView = new FXMLLoader(Prompt.class.getResource(ResourcePath.SIGN_IN_VIEW));
+        AnchorPane signInAnchorPane = signInView.load();
+        SignInController signInController = signInView.getController();
+        signInController.message.setText(message);
+        signInController.getSignIn().setOnAction(e -> {
+            signInController.credentials = new Credentials(signInController.username.getText(), signInController.password.getText());
+            stage.close();
+        });
+        signInController.signUp.setOnMouseClicked(e -> {
+            try {
+                FXMLLoader signUpView = new FXMLLoader(Prompt.class.getResource(ResourcePath.SIGN_UP_VIEW));
+                AnchorPane signUpAnchorPane = signUpView.load();
+                SignInController signUpController = signInView.getController();
+                signUpController.message.setText(message);
+                Scene signUpScene = new Scene(signUpAnchorPane);
+                stage.setScene(signUpScene);
+                stage.setTitle("Signup");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        Scene signInScene = new Scene(signInAnchorPane);
+        stage.setScene(signInScene);
+        stage.setTitle("Login");
+        stage.setResizable(false);
+        stage.initModality(Modality.NONE);
+        stage.showAndWait();
+        return signInController.getCredentials();
+    }
+
 }

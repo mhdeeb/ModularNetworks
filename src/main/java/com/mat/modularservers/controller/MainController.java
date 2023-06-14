@@ -7,6 +7,7 @@
 
 package com.mat.modularservers.controller;
 
+import com.mat.modularservers.util.ResourcePath;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
@@ -19,7 +20,7 @@ public class MainController {
 
     @FXML
     public void initialize() throws IOException {
-        Tab tab = ((TabPane) FXMLLoader.load(Objects.requireNonNull(this.getClass().getResource("/com/mat/modularservers/fxml/add-view.fxml")))).getTabs().get(0);
+        Tab tab = ((TabPane) FXMLLoader.load(Objects.requireNonNull(getClass().getResource(ResourcePath.ADD_VIEW)))).getTabs().get(0);
         tabs.getTabs().add(tab);
     }
 

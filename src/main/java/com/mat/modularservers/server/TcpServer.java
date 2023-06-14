@@ -88,13 +88,14 @@ public class TcpServer {
                 ExceptionUtil.logExceptions(() -> {
                     SocketWrapper client = new SocketWrapper(server.accept(), clients.getMessageQueue());
                     logger.logln(client.getName() + " connected.");
-                    if (clients.join(client)) broadcast(client.getName() + " has joined.", client);
-                    else if (client.isOn()) {
+                    if (clients.join(client)) {
+                        broadcast(client.getName() + " has joined.", client);
+                        client.sendFile("C:\\Users\\moham\\Desktop\\-\\processing-3.5.4-windows64.zip");
+                    } else if (client.isOn()) {
                         logger.logln(client.getName() + " is in pending list.");
                     } else {
                         logger.logln(client.getName() + " was kicked out.");
                     }
-//                    client.sendFile("C:\\Users\\moham\\Desktop\\-\\processing-3.5.4-windows64.zip");
                 }, logger);
             }
         }).start();
@@ -141,6 +142,10 @@ public class TcpServer {
                                 String[] credentials = message.getMessage().split(" ");
                                 client.setCredentials(new Credentials(credentials[0], credentials[1]));
                                 clients.register(client);
+                            }
+                            case QUIT -> {
+                                chat.logln(client.getName() + " has left.");
+                                clients.remove(client);
                             }
                         }
                     }

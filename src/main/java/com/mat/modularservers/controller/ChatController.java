@@ -31,4 +31,16 @@ public class ChatController {
 //        Utility.suggestible(textField);
         button1.disableProperty().bind(Bindings.createBooleanBinding(()-> textField.textProperty().getValue().length() == 0,textField.textProperty()));
     }
+
+    public TextField getTextField() {
+        return textField;
+    }
+
+    public TextArea getTextArea() {
+        return textArea;
+    }
+
+    public Button getButton1() {
+        return button1;
+    }
 }
